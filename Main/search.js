@@ -1,6 +1,8 @@
 const api_url = 'https://codeforces.com/api/';
-const handle = 'toki-debug';
 
+
+const rand = Math.floor(Math.random() * 123456);
+const tempo =  1640651957;
 
 let contestId;
 let contestName;
@@ -8,35 +10,32 @@ let contestIndex;
 let contestVer;
 
 
-$(document).ready(function (e) {
-    $('#handle-form').submit(function(e){
-        e.preventDefault();
-        let handle = '';
-        handle = $('#handle').val().trim();
-        if(!handle){
-            console.log("Nada aqui ainda");
-            return;
-        }
-        console.log("Oppa");
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function demo() {
+  console.log('Taking a break...');
+  await sleep(10000);
+  console.log('Two seconds later, showing sleep in a loop...');
+}
 
-        let req = $.get(api_url + 'contest.list?gym=true', function(data){
-           for(var i = data.result.length - 1 ;i>=0;i--){
-            contestId = data.result[i].id;
-            console.log(contestId);
-            fetch(api_url + 'contest.status?' + new URLSearchParams({contestId: contestId, handle: handle}).toString()), function(contest){
-              for(let i = contest.result.length - 1 ;i>=0;i--){
-                if(!contest.result[i].length){
-                  console.log("Nada aqui ainda");
-                  return;
-              }
-               contestIndex = data.result[i].index;
-               contestVer = data.result[i].verdict;
-               console.log(contestIndex + contestVer);
-              }
-            }
-           }
-        });
-    });
+$(document).ready(function (e) {
+  $('#handle-form').submit(async function(e){
+      e.preventDefault();
+      let handle = '';
+      handle = $('#handle').val().trim();
+      if(!handle){
+          console.log("Nada aqui ainda");
+          return;
+      }
+    
+        console.log("Oppa");
+        const res = await fetch(api_url + 'user.status?'+ new URLSearchParams({handle: handle}));
+        const json = await res.json();
+        json.result.reduce((acc, v) => {if (!acc[v.contestId]) acc[v.contestId] = []; acc[v.contestId].push(v); return acc}, {})
+        console.log(json);
+    
+});
 });
 
 
