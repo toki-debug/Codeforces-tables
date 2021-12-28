@@ -1,12 +1,17 @@
-var api_url = 'https://codeforces.com/api/';
-var handle = 'toki-debug';
+const api_url = 'https://codeforces.com/api/';
+const handle = 'toki-debug';
 
+
+let contestId;
+let contestName;
+let contestIndex;
+let contestVer;
 
 
 $(document).ready(function (e) {
     $('#handle-form').submit(function(e){
         e.preventDefault();
-        var handle = '';
+        let handle = '';
         handle = $('#handle').val().trim();
         if(!handle){
             console.log("Nada aqui ainda");
@@ -14,25 +19,21 @@ $(document).ready(function (e) {
         }
         console.log("Oppa");
 
-        // getting all the submissions of a user
-        var req = $.get(api_url + 'user.status', {handle: handle}  , function(data, status){
-           console.log(data.result.length); 
+        let req = $.get(api_url + 'contest.list?gym=true', function(data){
            for(var i = data.result.length - 1 ;i>=0;i--){
-               var sub = data.result[i];
-               var contestType;
-               var contest_url = sub.contestId;
-               console.log(sub.contestId);
-               /*var req2 = $.get(api_url + 'contest.list?contestId=' + sub.contestId + '&handle=' + handle,  function(data2, status2){ 
-                if(data2.result.length==0){
-                  console.log("nada aqui");
-                }else{
-                  for(var j = data2.result.length - 1 ;j>=0;j--){
-                    var constest = data2.result[j];
-                    console.log(constest.problem.index);
-                  }
-                } 
-              });*/
-
+            contestId = data.result[i].id;
+            console.log(contestId);
+            fetch(api_url + 'contest.status?' + new URLSearchParams({contestId: contestId, handle: handle}).toString()), function(contest){
+              for(let i = contest.result.length - 1 ;i>=0;i--){
+                if(!contest.result[i].length){
+                  console.log("Nada aqui ainda");
+                  return;
+              }
+               contestIndex = data.result[i].index;
+               contestVer = data.result[i].verdict;
+               console.log(contestIndex + contestVer);
+              }
+            }
            }
         });
     });
