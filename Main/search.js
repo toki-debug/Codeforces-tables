@@ -1,60 +1,163 @@
-const api_url = 'https://codeforces.com/api/';
-
+const api_url = "https://codeforces.com/api/";
 
 const rand = Math.floor(Math.random() * 123456);
-const tempo =  1640651957;
+const tempo = 1640651957;
 
 let contestId;
 let contestName;
 let contestIndex;
 let contestVer;
 
-
+function verify_r(num){
+  let s;
+  if(num < 1200){
+    s = "rgb(204, 204, 204)";
+  }
+  else if(num >= 1200 && num < 1400){
+    s = "rgb(119, 255, 119)";
+  }
+  else if(num >= 1400 && num < 1600){
+    s = "rgb(119, 221, 187)";
+  }
+  else if(num >= 1600 && num < 1900){
+    s = "rgb(43, 43, 255)";
+  }
+  else if(num >= 1900 && num < 2100){
+    s = "rgb(121, 63, 185)";
+  }
+  else if(num >= 2100 && num < 2300){
+    s = "rgb(255, 204, 136)";
+  }
+  else if(num >= 2300 && num < 2400){
+    s = "rgb(255, 187, 85)";
+  }
+  else if(num >= 2400 && num < 2600){
+    s = "rgb(255, 119, 119)";
+  }
+  else if(num >= 2600 && num < 3000){
+    s = "rgb(255, 51, 51)";
+  }
+  else if(num >= 3000){
+    s = "rgb(223, 3, 3)";
+  }
+  return s;
+}
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 async function demo() {
-  console.log('Taking a break...');
+  console.log("Taking a break...");
   await sleep(10000);
-  console.log('Two seconds later, showing sleep in a loop...');
+  console.log("Two seconds later, showing sleep in a loop...");
+}
+
+async function loadUserInfo() {
+  const handle = new URL(window.location.href).searchParams?.get('handle') ?? '';
+  const response = await fetch(api_url + '/user.info?' + new URLSearchParams({ handles: handle }));
+
+  if (response.status === 200 && response.headers.get('content-type').indexOf('application/json') !== -1) {
+    const data = await response.json();
+
+    if (data.status === 'OK') {
+      const user = data.result[0];
+      
+      document.querySelector('[data-name="titlePhoto"]').src = user.titlePhoto;
+      document.querySelector('[data-name="menuPhoto"]').src = user.titlePhoto;
+      document.querySelector('[data-name="handle"]').innerText = user.handle;
+      document.querySelector('[data-name="rating"]').innerText = "Contest rating: " + user.rating;
+      document.querySelector('[data-name="maxRating"]').innerText = "Max rating: " + user.maxRating;
+      document.querySelector('[data-name="rank"]').innerText = user.rank;
+      document.querySelector('[data-name="maxRank"]').innerText = user.maxRank;
+      
+      let element = document.getElementById("rank_color");
+      let element1 = document.getElementById("maxRank_color");
+
+      element.style.color = verify_r(user.rating);
+      element1.style.color = verify_r(user.maxRating);
+      
+      // console.log(user.organization.length);
+      if(typeof user.organization !== 'undefined' && user.organization.length !== 0){
+        document.querySelector('[data-name="organization"]').innerText = "From: " + user.organization;
+        
+      }
+      
+      if(typeof user.country !== 'undefined')
+        document.querySelector('[data-name="country"]').innerText = "Country: " + user.country;
+    } 
+    else {
+      alert("EU acho que fudeu um pouco...");
+      location.href = 'index.html';
+    }
+  }
+  else {
+    alert("Olha, assim, fudeu com toda certeza!");
+    location.href = 'index.html';
+  }
 }
 
 $(document).ready(function (e) {
-  $('#handle-form').submit(async function(e){
-      e.preventDefault();
-      let handle = '';
-      handle = $('#handle').val().trim();
-      if(!handle){
-          console.log("Nada aqui ainda");
-          return;
-      }
-    
-        console.log("Oppa");
-        const res = await fetch(api_url + 'user.status?'+ new URLSearchParams({handle: handle}));
-        const json = await res.json();
-        json.result.reduce((acc, v) => {if (!acc[v.contestId]) acc[v.contestId] = []; acc[v.contestId].push(v); return acc}, {})
-        console.log(json);
-        let tr, th;
-        let order = ['contestId', 'kills', 'deaths', 'broken', 'placed', 'fish', 'onlinetime', 'mobskilled', 'crops'];
-  
+  if ($("#input_search")?.val()?.length > 0) {
+    $("#input_search").parent("label").addClass("active");
+  }
+  $("#input_search").on("focus", function () {
+    $(this).parent("label").addClass("active");
+  });
+
+  $("#input_search").on("blur", function () {
+    if ($(this).val().length == 0)
+      $(this).parent("label").removeClass("active");
+  });
+  $("#handle-form").submit(async function (e) {
+    e.preventDefault();
+    let handle = "";
+    handle = $("#handle").val().trim();
+    if (!handle) {
+      console.log("Nada aqui ainda");
+      return;
+    }
+
+    console.log("Oppa");
+    const res = await fetch(
+      api_url + "user.status?" + new URLSearchParams({ handle: handle })
+    );
+    const json = await res.json();
+    json.result.reduce((acc, v) => {
+      if (!acc[v.contestId]) acc[v.contestId] = [];
+      acc[v.contestId].push(v);
+      return acc;
+    }, {});
+    console.log(json);
+    let tr, th;
+    let order = [
+      "contestId",
+      "kills",
+      "deaths",
+      "broken",
+      "placed",
+      "fish",
+      "onlinetime",
+      "mobskilled",
+      "crops",
+    ];
+
     for (var i = 0; i < json.length; i++) {
-      tr = $('<tr/>');
-      th = $('<tr/>');
-      
-      if (i === 0) { // create table headers               
-        for (var j = 0; j < order.length; j++) { 
+      tr = $("<tr/>");
+      th = $("<tr/>");
+
+      if (i === 0) {
+        // create table headers
+        for (var j = 0; j < order.length; j++) {
           th.append("<th>" + order[j] + "</th>");
-          $('table').append(th)
-        }         
-      }     
-        
-      for (var j = 0; j < order.length; j++) { 
+          $("table").append(th);
+        }
+      }
+
+      for (var j = 0; j < order.length; j++) {
         tr.append("<td>" + json[i][order[j]] + "</td>");
-        $('table').append(tr);      
+        $("table").append(tr);
       }
     }
-    
-});
+  });
 });
 
 /**$(document).ready(function () {

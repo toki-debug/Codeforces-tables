@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Result</title>
+  <link rel="shortcut icon" href="images/codeforce_icon.png" />
+  <link rel="stylesheet" href="css/pages/table.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="search.js"></script>
+</head>
+
+<body>
+  <script>loadUserInfo()</script>
+  <header>
+    <a href="index.html" class="logo"><img class="logo" src="images/codeforces_logo1.png" alt=""></a>
+    <form action="table.html">
+      <label class="search" for="input_search">
+        <input name="handle" type="text" id="input_search" />
+      </label>
+    </form>
+    <div class="dropdown">
+      <img class="menuFoto" data-name="menuPhoto" alt="">
+      <div class="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <div class="content">
+      <div class="box">
+        <img class="avatar" data-name="titlePhoto" alt="">
+        <p data-name="handle"></p>
+        <p id="rank_color" data-name="rank"></p>
+      </div>
+      
+      <aside class="deladinho box">
+        <p data-name="rating"></p>
+        <p data-name="maxRating"></p>
+        <p>Max Rank: <span id="maxRank_color"data-name="maxRank"></span></p>
+        <p data-name="organization"></p>
+        <p data-name="country"></p>
+      </aside>
+    </div>
+  </div>
+</body>
+
+</html>
